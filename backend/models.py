@@ -1,4 +1,5 @@
 from sqlalchemy import BigInteger, String, Boolean, Date, ForeignKey
+from sqlalchemy.ext.asyncio import create_async_engine, async_sessionmaker
 from sqlalchemy.orm import Mapped, mapped_column, relationship, DeclarativeBase
 from typing import List, Optional
 
@@ -103,3 +104,14 @@ class StampCollection(Base):
 
     stamp_id: Mapped[int] = mapped_column(ForeignKey("stamp.id"), primary_key=True, index=True)
     collection_id: Mapped[int] = mapped_column(ForeignKey("collection.id"), primary_key=True, index=True)
+
+
+db_url = "postgresql+asyncpg://user:password@localhost:5433/filatel"
+
+
+engine = create_async_engine(db_url, echo=False)
+SessionLocal = async_sessionmaker(engine, expire_on_commit=False)
+
+async def get_db():
+    async with SessionLocal() as session:
+        yield session
