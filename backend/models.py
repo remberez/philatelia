@@ -12,7 +12,7 @@ class User(Base):
     username: Mapped[str] = mapped_column(String, index=True)
     email: Mapped[str] = mapped_column(String, index=True)
     role: Mapped[Optional[str]] = mapped_column(String)
-    hashed_pass: Mapped[int] = mapped_column(BigInteger)
+    hashed_pass: Mapped[str] = mapped_column(String)
 
     collections: Mapped[List["Collection"]] = relationship(back_populates="owner")
     stamps: Mapped[List["Stamp"]] = relationship(back_populates="owner")
