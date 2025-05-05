@@ -1,0 +1,15 @@
+version: '3.8'
+
+services:
+  pg:
+    image: postgres:17
+    environment:
+      POSTGRES_DB: filatel
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: password
+    ports:
+      - "5433:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+volumes:
+  pgdata:
