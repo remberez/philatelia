@@ -1,4 +1,6 @@
-from sqlalchemy import BigInteger, String, Boolean, Date, ForeignKey
+import enum
+
+from sqlalchemy import BigInteger, String, Boolean, Date, ForeignKey, Enum
 from sqlalchemy.ext.asyncio import create_async_engine, async_sessionmaker
 from sqlalchemy.orm import Mapped, mapped_column, relationship, DeclarativeBase
 from typing import List, Optional
@@ -6,13 +8,17 @@ from typing import List, Optional
 class Base(DeclarativeBase):
     pass
 
+class UserRoles(enum.Enum):
+    ADMIN = "admin"
+    USER = "user"
+
 class User(Base):
     __tablename__ = "user"
 
     id: Mapped[int] = mapped_column(BigInteger, primary_key=True)
     username: Mapped[str] = mapped_column(String, index=True)
     email: Mapped[str] = mapped_column(String, index=True)
-    role: Mapped[Optional[str]] = mapped_column(String)
+    role: Mapped[UserRoles] = mapped_column(Enum(UserRoles))
     hashed_pass: Mapped[str] = mapped_column(String)
 
     collections: Mapped[List["Collection"]] = relationship(back_populates="owner")
