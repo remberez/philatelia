@@ -87,7 +87,7 @@ const MainLayout = () => {
         </div>
       </header>
 
-      <main className="flex-1 flex items-center justify-center">
+      <main className="flex-1">
         <Outlet />
       </main>
 
