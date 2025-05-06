@@ -56,6 +56,11 @@ const userService = {
       console.error("Error fetching user data:", error);
       throw new Error("Failed to fetch user data");
     }
+  },
+
+  async updateMe(data) {
+    const resposne = await api.put("/auth/me", data);
+    return resposne.data;
   }
 };
 

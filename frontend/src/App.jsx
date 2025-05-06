@@ -6,6 +6,7 @@ import { useEffect } from "react";
 import authService from "./services/userService";
 import LoginPage from "./components/LoginPage";
 import ProfilePage from "./components/ProfilePage";
+import SettingsPage from "./components/SettingsPage";
 
 function App() {
   useEffect(() => {
@@ -24,6 +25,7 @@ function App() {
         <Route index element={<Home/>}/>
         <Route path="/login" element={<LoginPage/>}/>
         <Route path="/profile" element={<ProfilePage/>}/>
+        <Route path="/settings" element={<SettingsPage/>}/>
       </Route>
     </Routes>
   )
