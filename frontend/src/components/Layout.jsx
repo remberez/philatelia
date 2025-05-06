@@ -1,5 +1,6 @@
 import { Outlet, Link } from "react-router-dom";
-import { useState } from "react";
+import { use, useState } from "react";
+import userStore from "../stores/userStore";
 
 const MainLayout = () => {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
@@ -27,7 +28,9 @@ const MainLayout = () => {
             </nav>
           </div>
           
-          <div className="relative">
+          {
+            userStore.isAuth ?
+            <div className="relative">
             <button
               onClick={toggleDropdown}
               className="flex items-center space-x-2 px-4 py-2 bg-blue-700 rounded-full hover:bg-blue-800"
@@ -67,7 +70,6 @@ const MainLayout = () => {
                   <button
                     className="block w-full px-4 py-2 text-left text-gray-700 hover:bg-gray-100"
                     onClick={() => {
-                      // Handle logout
                       console.log("Logged out");
                     }}
                   >
@@ -76,7 +78,11 @@ const MainLayout = () => {
                 </div>
               </div>
             )}
-          </div>
+          </div> :
+          <Link to="/login">
+            Войти
+          </Link>
+          }
         </div>
       </header>
 
