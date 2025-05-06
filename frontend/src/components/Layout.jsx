@@ -1,6 +1,7 @@
 import { Outlet, Link } from "react-router-dom";
 import { use, useState } from "react";
 import userStore from "../stores/userStore";
+import {observer} from "mobx-react-lite"
 
 const MainLayout = () => {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
@@ -86,7 +87,7 @@ const MainLayout = () => {
         </div>
       </header>
 
-      <main className="flex-grow p-4">
+      <main className="flex-1 flex items-center justify-center">
         <Outlet />
       </main>
 
@@ -97,4 +98,4 @@ const MainLayout = () => {
   );
 };
 
-export default MainLayout;
+export default observer(MainLayout);

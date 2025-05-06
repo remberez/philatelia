@@ -1,6 +1,7 @@
+import userStore from '../stores/userStore';
 import { api } from './api';
 
-const authService = {
+const userService = {
   async register(username, email, password) {
     try {
       const response = await api.post('/auth/register', {
@@ -17,18 +18,25 @@ const authService = {
 
   async login(email, password) {
     try {
-      const response = await api.post('/auth/login', {
-        email,
-        password,
-      });
-
+      const formData = new FormData();
+      formData.append('grant_type', 'password');
+      formData.append('username', email); 
+      formData.append('password', password);
+    
+      const response = await api.post('/auth/token', formData, {
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded', // Правильный тип контента
+        },
+      });  // Отправляем данные
+  
       const { access_token } = response.data;
-
+  
       if (access_token) {
         localStorage.setItem('token', access_token);
-        return response.data;
+        userStore.setUser(userService.getUser());
+        return access_token;
       }
-      
+  
       throw new Error("Authorization failed");
     } catch (error) {
       console.error("Login error:", error);
@@ -42,7 +50,7 @@ const authService = {
 
   async getUser() {
     try {
-      const response = await api.get("/users/me");
+      const response = await api.get("/auth/me");
       return response.data;
     } catch (error) {
       console.error("Error fetching user data:", error);
@@ -51,4 +59,4 @@ const authService = {
   }
 };
 
-export default authService;
+export default userService;

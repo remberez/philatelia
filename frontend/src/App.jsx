@@ -4,6 +4,7 @@ import Home from "./components/HomePage"
 import userStore from "./stores/userStore";
 import { useEffect } from "react";
 import authService from "./services/userService";
+import LoginPage from "./components/LoginPage";
 
 function App() {
   useEffect(() => {
@@ -20,6 +21,7 @@ function App() {
     <Routes>
       <Route path="/" element={<MainLayout/>}>
         <Route index element={<Home/>}/>
+        <Route path="/login" element={<LoginPage/>}/>
       </Route>
     </Routes>
   )
