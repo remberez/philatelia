@@ -25,6 +25,7 @@ class User(Base):
     stamps: Mapped[List["Stamp"]] = relationship(back_populates="owner")
     groups: Mapped[List["Group"]] = relationship(secondary="user_group", back_populates="users")
     meetings: Mapped[List["Meeting"]] = relationship(secondary="meeting_user", back_populates="visitors")
+    user_groups: Mapped[List["Group"]] = relationship(back_populates="group_owner")
 
 class Group(Base):
     __tablename__ = "group"
@@ -33,7 +34,9 @@ class Group(Base):
     name: Mapped[str] = mapped_column(String)
     description: Mapped[str] = mapped_column(String)
     groupname: Mapped[str] = mapped_column(String, unique=True, index=True)
+    group_owner_id: Mapped[int] = mapped_column(ForeignKey("user.id", ondelete="SET NULL"))
 
+    group_owner: Mapped["User"] = relationship(back_populates="user_groups")
     posts: Mapped[List["Post"]] = relationship(back_populates="group")
     meetings: Mapped[List["Meeting"]] = relationship(back_populates="group")
     post_photos: Mapped[List["PostPhoto"]] = relationship(back_populates="group")
