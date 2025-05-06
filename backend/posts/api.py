@@ -9,7 +9,7 @@ from users.schemas import UserRead
 from models import get_db
 from users.depends import get_current_user
 
-router = APIRouter(prefix="/posts", tags=["Posts"])
+router = APIRouter(prefix="/api/posts", tags=["Posts"])
 
 @router.post("/", response_model=PostRead)
 async def create_post(

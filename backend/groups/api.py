@@ -11,7 +11,7 @@ from users.depends import get_current_user
 from users.schemas import UserRead
 from .schemas import GroupCreate, GroupUpdate, GroupRead
 
-router = APIRouter(prefix="/groups", tags=["Groups"])
+router = APIRouter(prefix="/api/groups", tags=["Groups"])
 
 
 @router.post("/", response_model=GroupRead)
