@@ -40,12 +40,12 @@ async def get_posts(db: AsyncSession = Depends(get_db)):
     posts = result.all()
     post_list = [
         PostRead(
-            id=post[0].id,
-            title=post[0].title,
-            text=post[0].text,
-            group_id=post[0].group_id,
-            created_at=post[0].created_at,
-            author=post[2].username  # username владельца группы
+            id=post.Post.id,
+            title=post.Post.title,
+            text=post.Post.text,
+            group_id=post.Post.group_id,
+            created_at=post.Post.created_at,
+            author=post.User.username  # username владельца группы
         ) for post in posts
     ]
     return post_list
