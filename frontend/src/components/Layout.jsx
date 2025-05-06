@@ -13,7 +13,7 @@ const MainLayout = () => {
   return (
     <div className="min-h-screen flex flex-col bg-gray-50">
       <header className="bg-blue-600 text-white p-4 shadow-lg">
-        <div className="max-w-7xl mx-auto flex items-center justify-between">
+        <div className="container mx-auto flex items-center justify-between">
           <div className="flex items-center space-x-4">
             <h1 className="text-3xl font-semibold">Philatelist Club</h1>
             <nav className="hidden md:flex space-x-6 ml-10">
