@@ -4,8 +4,9 @@ from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from models import Group, UserGroup, User
+from models import Group, UserGroup, User, Post
 from models import get_db
+from posts.schemas import PostRead
 from users.depends import get_current_user
 from users.schemas import UserRead
 from .schemas import GroupCreate, GroupUpdate, GroupRead
@@ -153,3 +154,15 @@ async def leave_group(
     await db.delete(user_group)
     await db.commit()
     return True
+
+
+@router.get("/group/{group_id}", response_model=List[PostRead])
+async def get_group_posts(
+    group_id: int,
+    db: AsyncSession = Depends(get_db)
+):
+    result = await db.execute(
+        select(Post).where(Post.group_id == group_id)
+    )
+    posts = result.scalars().all()
+    return posts
