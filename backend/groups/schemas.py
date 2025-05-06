@@ -16,6 +16,7 @@ class GroupUpdate(BaseModel):
 
 class GroupRead(GroupBase):
     id: int
+    group_owner_id: int
 
     class Config:
         orm_mode = True
