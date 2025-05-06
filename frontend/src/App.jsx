@@ -1,10 +1,14 @@
+import { Route, Routes } from "react-router-dom"
+import MainLayout from "./components/Layout"
+import Home from "./components/HomePage"
+
 function App() {
   return (
-    <>
-        <h1 class="text-3xl font-bold underline">
-          Hello world!
-        </h1>
-    </>
+    <Routes>
+      <Route path="/" element={<MainLayout/>}>
+        <Route index element={<Home/>}/>
+      </Route>
+    </Routes>
   )
 }
 
