@@ -1,6 +1,6 @@
 import enum
 
-from sqlalchemy import BigInteger, String, Boolean, Date, ForeignKey, Enum
+from sqlalchemy import BigInteger, String, Boolean, Date, ForeignKey, Enum, DateTime, func
 from sqlalchemy.ext.asyncio import create_async_engine, async_sessionmaker
 from sqlalchemy.orm import Mapped, mapped_column, relationship, DeclarativeBase
 from typing import List, Optional
@@ -55,6 +55,7 @@ class Post(Base):
     title: Mapped[str] = mapped_column(String)
     text: Mapped[str] = mapped_column(String)
     group_id: Mapped[int] = mapped_column(ForeignKey("group.id"), index=True)
+    created_at: Mapped[DateTime] = mapped_column(DateTime, default=func.now())
 
     group: Mapped["Group"] = relationship(back_populates="posts")
 
