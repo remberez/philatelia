@@ -3,7 +3,7 @@ from typing import List, Annotated
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
 
-from models import Post, Group, UserRoles
+from models import Post, Group, UserRoles, User
 from .schemas import PostCreate, PostUpdate, PostRead
 from users.schemas import UserRead
 from models import get_db
@@ -32,17 +32,45 @@ async def create_post(
 
 @router.get("/", response_model=List[PostRead])
 async def get_posts(db: AsyncSession = Depends(get_db)):
-    result = await db.execute(select(Post))
-    return result.scalars().all()
+    result = await db.execute(
+        select(Post, Group, User)  # Запрос на выборку постов, групп и пользователей
+        .join(Group, Group.id == Post.group_id)  # Объединяем Post и Group
+        .join(User, User.id == Group.group_owner_id)  # Объединяем Group и User (владельца)
+    )
+    posts = result.all()
+    post_list = [
+        PostRead(
+            id=post[0].id,
+            title=post[0].title,
+            text=post[0].text,
+            group_id=post[0].group_id,
+            created_at=post[0].created_at,
+            author=post[2].username  # username владельца группы
+        ) for post in posts
+    ]
+    return post_list
 
 
 @router.get("/{post_id}", response_model=PostRead)
 async def get_post(post_id: int, db: AsyncSession = Depends(get_db)):
-    result = await db.execute(select(Post).where(Post.id == post_id))
+    result = await db.execute(
+        select(Post, Group, User)
+        .join(Group, Group.id == Post.group_id)
+        .join(User, User.id == Group.group_owner_id)
+        .where(Post.id == post_id)
+    )
     post = result.scalar_one_or_none()
     if not post:
         raise HTTPException(status_code=404, detail="Post not found")
-    return post
+
+    return PostRead(
+        id=post[0].id,
+        title=post[0].title,
+        text=post[0].text,
+        group_id=post[0].group_id,
+        created_at=post[0].created_at,
+        author=post[2].username  # username владельца группы
+    )
 
 
 @router.put("/{post_id}", response_model=PostRead)

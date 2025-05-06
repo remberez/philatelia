@@ -1,3 +1,5 @@
+from datetime import datetime
+
 from pydantic import BaseModel
 
 class PostBase(BaseModel):
@@ -12,7 +14,13 @@ class PostUpdate(BaseModel):
     title: str | None = None
     text: str | None = None
 
-class PostRead(PostBase):
+class PostRead(BaseModel):
     id: int
+    title: str
+    text: str
+    group_id: int
+    created_at: datetime
+    author: str
+
     class Config:
         orm_mode = True
