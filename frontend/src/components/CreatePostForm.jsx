@@ -8,6 +8,24 @@ export default function CreatePostForm({ onSubmit }) {
   const [groups, setGroups] = useState([]);
   const [groupId, setGroupId] = useState(null);
 
+  const [photoUrls, setPhotoUrls] = useState([""]); // массив ссылок
+
+  const handlePhotoChange = (index, value) => {
+    const newPhotos = [...photoUrls];
+    newPhotos[index] = value;
+    setPhotoUrls(newPhotos);
+  };
+
+  const addPhotoField = () => {
+    setPhotoUrls([...photoUrls, ""]);
+  };
+
+  const removePhotoField = (index) => {
+    const newPhotos = [...photoUrls];
+    newPhotos.splice(index, 1);
+    setPhotoUrls(newPhotos);
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!title.trim() || !text.trim() || !groupId) return;
@@ -20,11 +38,22 @@ export default function CreatePostForm({ onSubmit }) {
 
     if (onSubmit) onSubmit(newPost);
 
-    const postData = await postsService.createPost({ ...newPost });
-    console.log(postData);
+    const postData = await postsService.createPost(newPost);
 
+    // Загружаем изображения
+    const validUrls = photoUrls.filter((url) => url.trim() !== "");
+    for (const url of validUrls) {
+      await postsService.addImage({
+        photo_url: url,
+        post_id: postData.id,
+        group_id: groupId,
+      });
+    }
+
+    // Очистить форму
     setTitle("");
     setText("");
+    setPhotoUrls([""]);
   };
 
   useEffect(() => {
@@ -32,7 +61,7 @@ export default function CreatePostForm({ onSubmit }) {
       const groupData = await groupService.getMyGroups();
       setGroups(groupData);
       if (groupData.length > 0) {
-        setGroupId(groupData[0].id); // установка значения по умолчанию
+        setGroupId(groupData[0].id);
       }
     }
 
@@ -87,6 +116,37 @@ export default function CreatePostForm({ onSubmit }) {
           placeholder="Введите текст поста"
           required
         />
+      </div>
+
+      <div>
+        <label className="block text-sm font-medium mb-1">Изображения (URL)</label>
+        {photoUrls.map((url, index) => (
+          <div key={index} className="flex items-center gap-2 mb-2">
+            <input
+              type="url"
+              value={url}
+              onChange={(e) => handlePhotoChange(index, e.target.value)}
+              className="flex-grow border rounded-lg px-4 py-2"
+              placeholder="https://example.com/image.jpg"
+            />
+            {photoUrls.length > 1 && (
+              <button
+                type="button"
+                onClick={() => removePhotoField(index)}
+                className="text-red-500 hover:underline text-sm"
+              >
+                Удалить
+              </button>
+            )}
+          </div>
+        ))}
+        <button
+          type="button"
+          onClick={addPhotoField}
+          className="text-blue-600 hover:underline text-sm mt-1"
+        >
+          + Добавить ещё изображение
+        </button>
       </div>
 
       <button

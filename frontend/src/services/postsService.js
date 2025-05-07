@@ -12,6 +12,10 @@ class PostService {
     async createPost({group_id, title, text}) {
         return (await api.post("/posts/", {group_id, text, title})).data;
     }
+
+    async addImage({photo_url, post_id, group_id}) {
+        return (await api.post("/posts/photo", {photo_url, post_id, group_id})).data;
+    }
 }
 
 export default new PostService();
