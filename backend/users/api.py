@@ -4,7 +4,7 @@ from sqlalchemy import delete, update
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
 
-from models import User
+from models import User, UserRoles
 from models import get_db
 from users.depends import get_current_user
 from users.schemas import UserRead, UserUpdate, UserCreate
@@ -36,7 +36,8 @@ async def register_user(user: UserCreate, db: AsyncSession = Depends(get_db)):
     new_user = User(
         username=user.username,
         email=user.email,
-        hashed_pass=get_password_hash(user.password)
+        hashed_pass=get_password_hash(user.password),
+        role=UserRoles.USER
     )
     db.add(new_user)
     await db.commit()
