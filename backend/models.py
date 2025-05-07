@@ -58,6 +58,7 @@ class Post(Base):
     created_at: Mapped[DateTime] = mapped_column(DateTime, default=func.now())
 
     group: Mapped["Group"] = relationship(back_populates="posts")
+    photos: Mapped[list["PostPhoto"]] = relationship(back_populates="post")
 
 class PostPhoto(Base):
     __tablename__ = "post_photo"
@@ -65,8 +66,10 @@ class PostPhoto(Base):
     id: Mapped[int] = mapped_column(BigInteger, primary_key=True)
     photo_url: Mapped[str] = mapped_column(String)
     group_id: Mapped[int] = mapped_column(ForeignKey("group.id"), index=True)
+    post_id: Mapped[int] = mapped_column(ForeignKey("post.id"), index=True)
 
     group: Mapped["Group"] = relationship(back_populates="post_photos")
+    post: Mapped["Post"] = relationship(back_populates="photos")
 
 class Meeting(Base):
     __tablename__ = "meeting"
