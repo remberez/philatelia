@@ -44,6 +44,11 @@ class GroupService {
         const resposne = await api.get("/groups/my");
         return resposne.data;
     }
+
+    async createGroup({name, description, groupname}) {
+        const response = await api.post("/groups", {name, description, groupname});
+        return response.data;
+    }
 }
 
 export default new GroupService();
