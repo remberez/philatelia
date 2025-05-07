@@ -45,6 +45,9 @@ export default function MyGroupsPage() {
           ))}
         </div>
       )}
+      <Link to={"/create-group"} className="mt-10 bg-blue-500 text-white inline-block px-12 py-4 rounded-lg font-bold">
+        Создать группу
+      </Link>
     </div>
   );
 }

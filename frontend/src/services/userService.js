@@ -4,7 +4,7 @@ import { api } from './api';
 const userService = {
   async register(username, email, password) {
     try {
-      const response = await api.post('/auth/register', {
+      const response = await api.post('/auth', {
         username,
         email,
         password,

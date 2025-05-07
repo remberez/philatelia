@@ -1,10 +1,11 @@
-import { Outlet, Link } from "react-router-dom";
+import { Outlet, Link, useNavigate } from "react-router-dom";
 import { use, useState } from "react";
 import userStore from "../stores/userStore";
 import {observer} from "mobx-react-lite"
 
 const MainLayout = () => {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const navigate = useNavigate();
 
   const toggleDropdown = () => {
     setIsDropdownOpen((prev) => !prev);
@@ -71,7 +72,10 @@ const MainLayout = () => {
                   <button
                     className="block w-full px-4 py-2 text-left text-gray-700 hover:bg-gray-100"
                     onClick={() => {
-                      console.log("Logged out");
+                      localStorage.removeItem("token");
+                      navigate("/");
+                      userStore.setUser(null);
+                      userStore.logout();
                     }}
                   >
                     Выйти
@@ -80,9 +84,14 @@ const MainLayout = () => {
               </div>
             )}
           </div> :
-          <Link to="/login">
-            Войти
-          </Link>
+          <div className="flex gap-x-6">
+              <Link to="/login">
+                Войти
+              </Link>
+              <Link to={"/registration"}>
+                Регистрация
+              </Link>
+          </div>
           }
         </div>
       </header>
