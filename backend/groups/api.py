@@ -42,6 +42,15 @@ async def get_groups(skip: int = 0, limit: int = 100, db: AsyncSession = Depends
     return result.scalars().all()
 
 
+@router.get("/my", response_model=List[GroupRead])
+async def get_my_groups(
+        user: Annotated[UserRead, Depends(get_current_user)],
+        db: AsyncSession = Depends(get_db),
+):
+    result = await db.execute(select(Group).where(Group.group_owner_id == user.id))
+    return result.scalars().all()
+
+
 @router.get("/{group_id}", response_model=GroupRead)
 async def get_group(group_id: int, db: AsyncSession = Depends(get_db)):
     result = await db.execute(select(Group).where(Group.id == group_id))
