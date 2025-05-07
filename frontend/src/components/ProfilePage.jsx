@@ -1,5 +1,6 @@
 import { observer } from "mobx-react-lite";
 import userStore from "../stores/userStore";
+import { Link } from "react-router-dom";
 
 const ProfilePage = () => {
     const user = userStore.user || {};
@@ -25,6 +26,9 @@ const ProfilePage = () => {
               <p className="text-gray-500 text-sm">Роль</p>
               <p className="text-gray-800 font-medium">{user.role}</p>
             </div>
+            <Link to={"/my-groups"} className="bg-green-500 px-4 py-2 text-white text-sm block text-center rounded-lg hover:bg-green-600">
+              Мои группы
+            </Link>
           </div>
         </div>
       </div>

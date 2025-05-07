@@ -10,6 +10,7 @@ import SettingsPage from "./components/SettingsPage";
 import GroupPage from "./components/GroupPage";
 import CreatePostForm from "./components/CreatePostForm";
 import CreateGroupPage from "./components/CreateGroupPage";
+import MyGroupsPage from "./components/MyGroupsPage";
 
 function App() {
   useEffect(() => {
@@ -32,6 +33,7 @@ function App() {
         <Route path="/group/:groupId" element={<GroupPage/>}/>
         <Route path="/create-post/" element={<CreatePostForm/>}/>
         <Route path="/create-group" element={<CreateGroupPage/>}/>
+        <Route path="/my-groups" element={<MyGroupsPage/>}/>
       </Route>
     </Routes>
   )
