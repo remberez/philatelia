@@ -7,6 +7,7 @@ import authService from "./services/userService";
 import LoginPage from "./components/LoginPage";
 import ProfilePage from "./components/ProfilePage";
 import SettingsPage from "./components/SettingsPage";
+import GroupPage from "./components/GroupPage";
 
 function App() {
   useEffect(() => {
@@ -26,6 +27,7 @@ function App() {
         <Route path="/login" element={<LoginPage/>}/>
         <Route path="/profile" element={<ProfilePage/>}/>
         <Route path="/settings" element={<SettingsPage/>}/>
+        <Route path="/group/:groupId" element={<GroupPage/>}/>
       </Route>
     </Routes>
   )
