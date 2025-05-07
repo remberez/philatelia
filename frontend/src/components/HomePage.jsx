@@ -26,7 +26,7 @@ const HomePage = () => {
               Автор: {post.author} | {new Date(post.created_at).toLocaleDateString()}
             </p>
             <Link
-              to={`/post/${post.id}`}
+              to={`/group/${post.group_id}`}
               className="mt-4 inline-block text-blue-600 hover:underline"
             >
               Читать дальше &rarr;

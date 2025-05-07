@@ -39,6 +39,11 @@ class GroupService {
             console.log("unauth")
         }
     }
+
+    async getMyGroups() {
+        const resposne = await api.get("/groups/my");
+        return resposne.data;
+    }
 }
 
 export default new GroupService();
