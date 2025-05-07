@@ -3,6 +3,7 @@ from typing import List, Annotated
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.orm import selectinload
 
 from models import Group, UserGroup, User, Post
 from models import get_db
@@ -94,7 +95,7 @@ async def delete_group(
     return True
 
 
-@router.post("/{group_id}/join", response_model=bool)
+@router.get("/{group_id}/join", response_model=bool)
 async def join_group(
         group_id: int,
         user: Annotated[UserRead, Depends(get_current_user)],
@@ -156,13 +157,50 @@ async def leave_group(
     return True
 
 
-@router.get("/group/{group_id}", response_model=List[PostRead])
+@router.get("/{group_id}/posts", response_model=List[PostRead])
 async def get_group_posts(
     group_id: int,
     db: AsyncSession = Depends(get_db)
 ):
     result = await db.execute(
-        select(Post).where(Post.group_id == group_id)
+        select(Post, Group, User)
+        .join(Group, Group.id == Post.group_id)
+        .join(User, User.id == Group.group_owner_id)
+        .options(selectinload(Post.photos))
+        .where(Post.group_id == group_id)
     )
-    posts = result.scalars().all()
+    rows = result.all()
+    posts = [
+        PostRead(
+            id=post.id,
+            title=post.title,
+            text=post.text,
+            group_id=post.group_id,
+            created_at=post.created_at,
+            author=post.group.group_owner.username,
+            photos=post.photos,
+        )
+        for post, group, user in rows
+    ]
     return posts
+
+
+@router.get("/{group_id}/is-member/")
+async def user_is_member(
+        user: Annotated[UserRead, Depends(get_current_user)],
+        group_id: int,
+        session: Annotated[AsyncSession, Depends(get_db)]
+):
+    # Загружаем пользователя с его группами
+    result = await session.execute(
+        select(User).where(User.id == user.id).options(selectinload(User.groups))
+    )
+    db_user = result.scalar_one_or_none()
+
+    if not db_user:
+        raise HTTPException(status_code=404, detail="Пользователь не найден")
+
+    # Проверяем, состоит ли в группе
+    is_member = any(group.id == group_id for group in db_user.groups)
+
+    return {"is_member": is_member}

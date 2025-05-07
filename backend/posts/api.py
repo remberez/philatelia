@@ -153,7 +153,7 @@ async def create_post_photo(
     return post_photo
 
 
-@router.get("/photo", response_model=List[PostPhotoInDB])
+@router.get("/photo/{group_id}", response_model=List[PostPhotoInDB])
 async def list_post_photos(
         group_id: int | None = None,
         db: AsyncSession = Depends(get_db),
