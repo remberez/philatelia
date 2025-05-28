@@ -59,6 +59,7 @@ class Post(Base):
 
     group: Mapped["Group"] = relationship(back_populates="posts")
     photos: Mapped[list["PostPhoto"]] = relationship(back_populates="post")
+    comments: Mapped[List["Comment"]] = relationship(back_populates="post")
 
 class PostPhoto(Base):
     __tablename__ = "post_photo"
@@ -117,6 +118,18 @@ class StampCollection(Base):
 
     stamp_id: Mapped[int] = mapped_column(ForeignKey("stamp.id"), primary_key=True, index=True)
     collection_id: Mapped[int] = mapped_column(ForeignKey("collection.id"), primary_key=True, index=True)
+
+class Comment(Base):
+    __tablename__ = "comment"
+
+    id: Mapped[int] = mapped_column(BigInteger, primary_key=True)
+    text: Mapped[str] = mapped_column(String)
+    created_at: Mapped[DateTime] = mapped_column(DateTime, default=func.now())
+    user_id: Mapped[int] = mapped_column(ForeignKey("user.id"), index=True)
+    post_id: Mapped[int] = mapped_column(ForeignKey("post.id"), index=True)
+
+    user: Mapped["User"] = relationship()
+    post: Mapped["Post"] = relationship()
 
 
 db_url = "postgresql+asyncpg://user:password@localhost:5433/filatel"

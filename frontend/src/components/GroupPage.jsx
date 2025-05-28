@@ -2,6 +2,8 @@ import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import groupService from "../services/groupService";
 import postsService from "../services/postsService";
+import commentService from "../services/commentService";
+import userStore from "../stores/userStore";
 
 export default function GroupPage() {
   const { groupId } = useParams();
@@ -11,6 +13,9 @@ export default function GroupPage() {
   const [members, setMembers] = useState([]);
   const [isMember, setIsMember] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [comments, setComments] = useState({}); // { [postId]: [comments] }
+  const [commentInputs, setCommentInputs] = useState({}); // { [postId]: "" }
+  const [editingComment, setEditingComment] = useState({}); // { [commentId]: text }
 
   useEffect(() => {
     async function fetchData() {
@@ -25,6 +30,13 @@ export default function GroupPage() {
 
       const membership = await groupService.isMember(groupId);
       setIsMember(membership);
+
+      // fetch comments for all posts
+      const commentsObj = {};
+      for (const post of postsData) {
+        commentsObj[post.id] = await commentService.getComments(post.id);
+      }
+      setComments(commentsObj);
 
       setLoading(false);
     }
@@ -42,6 +54,48 @@ export default function GroupPage() {
     setMembers(membersData);
     const membership = await groupService.isMember(groupId);
     setIsMember(membership);
+  };
+
+  const handleCommentInput = (postId, value) => {
+    setCommentInputs((prev) => ({ ...prev, [postId]: value }));
+  };
+
+  const handleAddComment = async (postId) => {
+    const text = commentInputs[postId]?.trim();
+    if (!text) return;
+    const newComment = await commentService.createComment(postId, text);
+    setComments((prev) => ({
+      ...prev,
+      [postId]: [...(prev[postId] || []), newComment],
+    }));
+    setCommentInputs((prev) => ({ ...prev, [postId]: "" }));
+  };
+
+  const handleDeleteComment = async (postId, commentId) => {
+    await commentService.deleteComment(commentId);
+    setComments((prev) => ({
+      ...prev,
+      [postId]: prev[postId].filter((c) => c.id !== commentId),
+    }));
+  };
+
+  const handleEditComment = (commentId, text) => {
+    setEditingComment((prev) => ({ ...prev, [commentId]: text }));
+  };
+
+  const handleUpdateComment = async (postId, commentId) => {
+    const text = editingComment[commentId]?.trim();
+    if (!text) return;
+    const updated = await commentService.updateComment(commentId, text);
+    setComments((prev) => ({
+      ...prev,
+      [postId]: prev[postId].map((c) => (c.id === commentId ? updated : c)),
+    }));
+    setEditingComment((prev) => {
+      const copy = { ...prev };
+      delete copy[commentId];
+      return copy;
+    });
   };
 
   if (loading) return <div className="text-center mt-10">Загрузка...</div>;
@@ -97,6 +151,56 @@ export default function GroupPage() {
                     ))}
                   </div>
                 )}
+                {/* Комментарии */}
+                <div className="mt-4">
+                  <h4 className="font-semibold mb-2">Комментарии</h4>
+                  <div className="space-y-2">
+                    {(comments[post.id] || []).map((comment) => (
+                      <div key={comment.id} className="flex items-start gap-2 group">
+                        <div className="flex-1">
+                          <span className="font-medium">{comment.user_id === userStore.user?.id ? "Вы" : `Пользователь #${comment.user_id}`}</span>
+                          <span className="ml-2 text-xs text-gray-500">{new Date(comment.created_at).toLocaleString("ru-RU")}</span>
+                          {editingComment[comment.id] !== undefined ? (
+                            <div className="flex gap-2 mt-1">
+                              <input
+                                className="border rounded px-2 py-1 text-sm flex-1"
+                                value={editingComment[comment.id]}
+                                onChange={e => handleEditComment(comment.id, e.target.value)}
+                              />
+                              <button className="text-blue-600 text-xs" onClick={() => handleUpdateComment(post.id, comment.id)}>Сохранить</button>
+                              <button className="text-gray-500 text-xs" onClick={() => handleEditComment(comment.id, undefined)}>Отмена</button>
+                            </div>
+                          ) : (
+                            <div className="mt-1 text-sm">{comment.text}</div>
+                          )}
+                        </div>
+                        {comment.user_id === userStore.user?.id && editingComment[comment.id] === undefined && (
+                          <div className="flex flex-col gap-1 opacity-0 group-hover:opacity-100 transition">
+                            <button className="text-xs text-blue-600" onClick={() => handleEditComment(comment.id, comment.text)}>Изменить</button>
+                            <button className="text-xs text-red-500" onClick={() => handleDeleteComment(post.id, comment.id)}>Удалить</button>
+                          </div>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                  {userStore.isAuth && (
+                    <div className="flex gap-2 mt-2">
+                      <input
+                        className="border rounded px-2 py-1 flex-1"
+                        placeholder="Написать комментарий..."
+                        value={commentInputs[post.id] || ""}
+                        onChange={e => handleCommentInput(post.id, e.target.value)}
+                        onKeyDown={e => { if (e.key === "Enter") handleAddComment(post.id); }}
+                      />
+                      <button
+                        className="bg-blue-600 text-white px-4 py-1 rounded"
+                        onClick={() => handleAddComment(post.id)}
+                      >
+                        Отправить
+                      </button>
+                    </div>
+                  )}
+                </div>
               </div>
             ))}
             {posts.length === 0 && (
